@@ -10,7 +10,7 @@ import http.client
 import httplib2
 import random
 import time
-from videoDetailsTester import Video
+from videoDetailsTopChannel import Video
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -22,6 +22,116 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+
+folder = '/home/ubuntu/Youtube'
+for filename in os.listdir(folder):
+  file_path = os.path.join(folder, filename)
+  try:
+    if os.path.isfile(file_path) or os.path.islink(file_path):
+      os.unlink(file_path)
+    elif os.path.isdir(file_path):
+      shutil.rmtree(file_path)
+  except Exception as e:
+    print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+twitchClipLinksTopChannel = []
+displayNameTopChannel = []
+displayNameLinkTopChannel = []
+viewsTopChannel = []
+clipCreatorNameTopChannel = []
+clipCreatorLinkTopChannel = []
+clipUploadTimeTopChannel = []
+currentFileTopChannel = []
+currentFileLengthTopChannel = []
+nextFileTopChannel = []
+
+with open('apiTwitchClipLinksTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        twitchClipLinksTopChannel.append(currentPlace)
+
+with open('apiDisplayNameTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        displayNameTopChannel.append(currentPlace)
+
+with open('apiDisplayNameLinkTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        displayNameLinkTopChannel.append(currentPlace)
+
+with open('apiViewsTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        viewsTopChannel.append(currentPlace)
+
+with open('apiClipCreatorNameTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        clipCreatorNameTopChannel.append(currentPlace)
+
+with open('apiClipCreatorLinkTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        clipCreatorLinkTopChannel.append(currentPlace)
+
+with open('apiClipUploadTimeTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        clipUploadTimeTopChannel.append(currentPlace)
+
+with open('currentFileTopChannel.py', 'r') as filehandle:
+    for line in filehandle:
+        currentPlace = line[:-1]
+        currentFileTopChannel.append(currentPlace)
+
+
+currentFileLength = len(currentFileTopChannel)
+i = 0
+while i < currentFileLength + 1:
+  nextFileTopChannel.insert(0,1)
+  i += 1
+
+with open('currentFileTopChannel.py', 'w') as filehandle:
+    for listitem in nextFileTopChannel:
+        filehandle.write('%s\n' % listitem)
+
+
+x = twitchClipLinksTopChannel[currentFileLength]
+ydl_opts = {}
+with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    ydl.download([x])
+time.sleep(10)
+
+
+def file_rename():
+    name_list=os.listdir(r"/home/ubuntu")
+    saved_path=os.getcwd()
+    os.chdir(r"/home/ubuntu")
+
+    for file_name in name_list:
+        os.rename(file_name, file_name.translate(str.maketrans('','','0123456789-')))
+    os.chdir(saved_path)
+file_rename()
+time.sleep(2)
+print('File Renamed')
+
+
+files = os.listdir(os.curdir)
+for file in files:
+    if '.mp' in file:
+        newfile = file.replace('.mp', '.mp4')
+        os.rename(file, newfile)
+time.sleep(2)
+print('File Converted')
+
+
+files = os.listdir(os.curdir)
+for file in files:
+    if '.mp4' in file:
+        shutil.move(file, '/home/ubuntu/Youtube')
+time.sleep(10)
+print('File Moved')
 
 class YoutubeUpload:
   def __init__(self):
@@ -41,7 +151,7 @@ class YoutubeUpload:
     self.API_VERSION = 'v3'
 
   def get_authenticated_service(self):
-      credential_path = os.path.join('./', 'credentials.json')
+      credential_path = os.path.join('/home/ubuntu/TopChannel/', 'credentials.json')
       store = Storage(credential_path)
       credentials = store.get()
       if not credentials or credentials.invalid:
@@ -66,7 +176,7 @@ class YoutubeUpload:
       )
     )
     
-    videoPath = "\\Video\\{}".format(options.getFileName("video"))
+    videoPath = "/home/ubuntu/Youtube/{}".format(options.getFileName("video"))
     insert_request = youtube.videos().insert(
       part=','.join(body.keys()),
       body=body,
