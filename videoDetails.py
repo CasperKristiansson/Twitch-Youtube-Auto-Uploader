@@ -68,8 +68,6 @@ class Video:
         resultClipTime = newtime.replace('Z', '')
 
         self.description = f"""
-Disclaimer: I own none of these clips and all of them are from the respective owner. If you want anything removed contact johnnybravaski@gmail.com
-
 ►Credit
 name: {streamerName}
 Twitch Link: {streamerLink}
@@ -81,13 +79,6 @@ Twitch Link: {clipCreatorlin}
 ►Clip Stats
 Views At Upload: {clipViews}
 Date and Time: {resultClipTime}
-
-Just started out this channel and I hope you can show me some support! I plan to continue to post a lot of content these upcoming months and reach 1000 Subscribers at the end of the year. I hope I can reach this goal and that you can become a part of it. This whole process of collecting videos, editing, and optimizing videos is a big passion of mine.
-
-► Don't forget to subscribe for more content!
-► If you want to see more make sure to comment, like, and turn on all notifications! 
-
-Disclaimer: I own none of these clips and all of them are from the respective owner. If you want anything removed contact johnnybravaski@gmail.com
 """
 
         self.category = "24"
