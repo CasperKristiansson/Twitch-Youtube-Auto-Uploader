@@ -1,108 +1,106 @@
 from __future__ import unicode_literals
-import youtube_dl
 import requests
 import os
 import shutil
-import time
-import sys
+import glob
+import twitch_credentials
 
-import argparse
-import http.client
-import httplib2
-import random
+def delete():
+    files = os.listdir(os.curdir)
+    for file in files:
+        if '.txt' in file:
+            shutil.move(file, 'txtFiles')
 
-import google.oauth2.credentials
-import google_auth_oauthlib.flow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
-from google_auth_oauthlib.flow import InstalledAppFlow
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+    files = glob.glob('txtFiles\\*')
+    for f in files:
+        os.remove(f)
 
-displayNameTopChannel = []
-displayNameLinkTopChannel = []
-viewsTopChannel = []
-clipCreatorNameTopChannel = []
-clipCreatorLinkTopChannel = []
-clipUploadTimeTopChannel = []
-currentFileTopChannel = []
+def get_data():
+    API_ENDPOINT = 'https://api.twitch.tv/kraken/clips/top?game=League%20of%20Legends&period=day&trending=false&limit=6&language=en'
+    auth = 'application/vnd.twitchtv.v5+json'
 
-with open('currentFileTopChannel.py', 'w') as filehandle:
-    for listitem in currentFileTopChannel:
-        filehandle.write('%s\n' % listitem)
-time.sleep(15)
+    head = {
+    'Client-ID' : twitch_credentials.ID,
+    'Accept' : auth
+    }
 
-API_ENDPOINT = 'https://api.twitch.tv/kraken/clips/top?channel=Sykkuno&period=all&trending=false&limit=100'
-ID = ''
-auth = 'application/vnd.twitchtv.v5+json'
+    r = requests.get(url = API_ENDPOINT, headers = head)
+    data = r.json()
 
-head = {
-'Client-ID' : ID,
-'Accept' : auth
-}
+    return data
 
-r = requests.get(url = API_ENDPOINT, headers = head)
+def save_data(data):
+    displayName = []
+    displayNameLink = []
+    views = []
+    clipCreatorName = []
+    clipCreatorLink = []
+    clipUploadTime = []
+    currentFile = []
+    twitchClipLinks = []
+    current_file = []
 
-twitchClipLinksTopChannel = []
-data = r.json()
+    for link in data['clips']:
+        store = str(link['url'])
+        twitchClipLinks.append(store)
 
-for link in data['clips']:
-    store = str(link['url'])
-    twitchClipLinksTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['broadcaster']['display_name'])
+        displayName.append(store)
 
-for link in data['clips']:
-    store = str(link['broadcaster']['display_name'])
-    displayNameTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['broadcaster']['channel_url'])
+        displayNameLink.append(store)
 
-for link in data['clips']:
-    store = str(link['broadcaster']['channel_url'])
-    displayNameLinkTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['views'])
+        views.append(store)
 
-for link in data['clips']:
-    store = str(link['views'])
-    viewsTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['curator']['display_name'])
+        clipCreatorName.append(store)
 
-for link in data['clips']:
-    store = str(link['curator']['display_name'])
-    clipCreatorNameTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['curator']['channel_url'])
+        clipCreatorLink.append(store)
 
-for link in data['clips']:
-    store = str(link['curator']['channel_url'])
-    clipCreatorLinkTopChannel.append(store)
+    for link in data['clips']:
+        store = str(link['created_at'])
+        clipUploadTime.append(store)
 
-for link in data['clips']:
-    store = str(link['created_at'])
-    clipUploadTimeTopChannel.append(store)
+    with open('apiTwitchClipLinks.txt', 'w') as filehandle:
+        for listitem in twitchClipLinks:
+            filehandle.write('%s\n' % listitem)
 
+    with open('apiDisplayName.txt', 'w') as filehandle:
+        for listitem in displayName:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiTwitchClipLinksTopChannel.py', 'w') as filehandle:
-    for listitem in twitchClipLinksTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('apiDisplayNameLink.txt', 'w') as filehandle:
+        for listitem in displayNameLink:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiDisplayNameTopChannel.py', 'w') as filehandle:
-    for listitem in displayNameTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('apiViews.txt', 'w') as filehandle:
+        for listitem in views:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiDisplayNameLinkTopChannel.py', 'w') as filehandle:
-    for listitem in displayNameLinkTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('apiClipCreatorName.txt', 'w') as filehandle:
+        for listitem in clipCreatorName:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiViewsTopChannel.py', 'w') as filehandle:
-    for listitem in viewsTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('apiClipCreatorLink.txt', 'w') as filehandle:
+        for listitem in clipCreatorLink:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiClipCreatorNameTopChannel.py', 'w') as filehandle:
-    for listitem in clipCreatorNameTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('apiClipUploadTime.txt', 'w') as filehandle:
+        for listitem in clipUploadTime:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiClipCreatorLinkTopChannel.py', 'w') as filehandle:
-    for listitem in clipCreatorLinkTopChannel:
-        filehandle.write('%s\n' % listitem)
+    with open('currentFile.txt', 'w') as filehandle:
+        for listitem in currentFile:
+            filehandle.write('%s\n' % listitem)
 
-with open('apiClipUploadTimeTopChannel.py', 'w') as filehandle:
-    for listitem in clipUploadTimeTopChannel:
-        filehandle.write('%s\n' % listitem)
-
-print('Urls stored in List')
+if __name__ == '__main__':
+    delete()
+    DATA = get_data()
+    #save_data(DATA)
