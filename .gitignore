@@ -13,3 +13,5 @@ Ch - Among
 .pytest_cache
 __pycache__
 twitch_credentials.py
+client_secrets.json
+credentials.json

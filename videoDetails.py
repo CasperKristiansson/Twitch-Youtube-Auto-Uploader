@@ -1,70 +1,69 @@
 import os
 from googleapiclient.http import MediaFileUpload
 
-twitchClipLinksTopChannel = []
-displayNameTopChannel = []
-displayNameLinkTopChannel = []
-viewsTopChannel = []
-clipCreatorNameTopChannel = []
-clipCreatorLinkTopChannel = []
-clipUploadTimeTopChannel = []
-currentFileTopChannel = []
-currentFileLengthTopChannel = []
+twitchClipLinks = []
+displayName = []
+displayNameLink = []
+views = []
+clipCreatorName = []
+clipCreatorLink = []
+clipUploadTime = []
+currentFile = []
+currentFileLength = []
 
-
-with open('currentFileTopChannel.py', 'r') as filehandle:
+with open('currentFile.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        currentFileTopChannel.append(currentPlace)
+        currentFile.append(currentPlace)
 
-with open('apiTwitchClipLinksTopChannel.py', 'r') as filehandle:
+with open('apiTwitchClipLinks.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        twitchClipLinksTopChannel.append(currentPlace)
+        twitchClipLinks.append(currentPlace)
 
-with open('apiDisplayNameTopChannel.py', 'r') as filehandle:
+with open('apiDisplayName.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        displayNameTopChannel.append(currentPlace)
+        displayName.append(currentPlace)
 
-with open('apiDisplayNameLinkTopChannel.py', 'r') as filehandle:
+with open('apiDisplayNameLink.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        displayNameLinkTopChannel.append(currentPlace)
+        displayNameLink.append(currentPlace)
 
-with open('apiViewsTopChannel.py', 'r') as filehandle:
+with open('apiViews.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        viewsTopChannel.append(currentPlace)
+        views.append(currentPlace)
 
-with open('apiClipCreatorNameTopChannel.py', 'r') as filehandle:
+with open('apiClipCreatorName.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        clipCreatorNameTopChannel.append(currentPlace)
+        clipCreatorName.append(currentPlace)
 
-with open('apiClipCreatorLinkTopChannel.py', 'r') as filehandle:
+with open('apiClipCreatorLink.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        clipCreatorLinkTopChannel.append(currentPlace)
+        clipCreatorLink.append(currentPlace)
 
-with open('apiClipUploadTimeTopChannel.py', 'r') as filehandle:
+with open('apiClipUploadTime.txt', 'r') as filehandle:
     for line in filehandle:
         currentPlace = line[:-1]
-        clipUploadTimeTopChannel.append(currentPlace)
+        clipUploadTime.append(currentPlace)
 
-currentFileLength = len(currentFileTopChannel)
+currentFileLength = len(currentFile)
 
 
 class Video:
     def __init__(self):
-        clipUpTime = clipUploadTimeTopChannel[currentFileLength]
+        clipUpTime = clipUploadTime[currentFileLength]
         newtime = clipUpTime.replace('T', ' ')
 
-        streamerName = displayNameTopChannel[currentFileLength]
-        streamerLink = displayNameLinkTopChannel[currentFileLength]
-        clipViews = viewsTopChannel[currentFileLength]
-        clipCreatorNam = clipCreatorNameTopChannel[currentFileLength]
-        clipCreatorlin = clipCreatorLinkTopChannel[currentFileLength]
+        streamerName = displayName[currentFileLength]
+        streamerLink = displayNameLink[currentFileLength]
+        clipViews = views[currentFileLength]
+        clipCreatorNam = clipCreatorName[currentFileLength]
+        clipCreatorlin = clipCreatorLink[currentFileLength]
         resultClipTime = newtime.replace('Z', '')
 
         self.description = f"""
@@ -86,7 +85,7 @@ Date and Time: {resultClipTime}
         self.privacyStatus = "public"
 
     def getFileName(self, type):
-        for file in os.listdir("/home/ubuntu/Youtube"):
+        for file in os.listdir("Video"):
             if type == "video" and file.split(".", 1)[1] != "jpg":
                 return file
                 break
@@ -95,7 +94,7 @@ Date and Time: {resultClipTime}
                 break
 
     def insertThumbnail(self, youtube, videoId):
-        thumnailPath = "/home/ubuntu/Youtube/{}".format(self.getFileName("thumbnail"))
+        thumnailPath = "Video\\{}".format(self.getFileName("thumbnail"))
 
         request = youtube.thumbnails().set(
             videoId=videoId,

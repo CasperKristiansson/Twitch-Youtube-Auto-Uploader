@@ -10,7 +10,7 @@ import http.client
 import httplib2
 import random
 import time
-from videoDetailsTopChannel import Video
+from videoDetails import Video
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -23,120 +23,74 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-folder = '/home/ubuntu/Youtube'
-for filename in os.listdir(folder):
-  file_path = os.path.join(folder, filename)
-  try:
-    if os.path.isfile(file_path) or os.path.islink(file_path):
-      os.unlink(file_path)
-    elif os.path.isdir(file_path):
-      shutil.rmtree(file_path)
-  except Exception as e:
-    print('Failed to delete %s. Reason: %s' % (file_path, e))
+def delete():
+  folder = 'Video'
+  for filename in os.listdir(folder):
+    file_path = os.path.join(folder, filename)
+    try:
+      if os.path.isfile(file_path) or os.path.islink(file_path):
+        os.unlink(file_path)
+      elif os.path.isdir(file_path):
+        shutil.rmtree(file_path)
+    except Exception as e:
+      print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-twitchClipLinksTopChannel = []
-displayNameTopChannel = []
-displayNameLinkTopChannel = []
-viewsTopChannel = []
-clipCreatorNameTopChannel = []
-clipCreatorLinkTopChannel = []
-clipUploadTimeTopChannel = []
-currentFileTopChannel = []
-currentFileLengthTopChannel = []
-nextFileTopChannel = []
+def get_files():
+  twitchClipLinks = []
 
-with open('apiTwitchClipLinksTopChannel.py', 'r') as filehandle:
+  with open('apiTwitchClipLinks.txt', 'r') as filehandle:
     for line in filehandle:
-        currentPlace = line[:-1]
-        twitchClipLinksTopChannel.append(currentPlace)
+      currentPlace = line[:-1]
+      twitchClipLinks.append(currentPlace)
 
-with open('apiDisplayNameTopChannel.py', 'r') as filehandle:
+  return twitchClipLinks
+
+def current_file():
+  currentFile = []
+  currentFileLength = []
+  nextFile = []
+
+  with open('currentFile.txt', 'r') as filehandle:
     for line in filehandle:
-        currentPlace = line[:-1]
-        displayNameTopChannel.append(currentPlace)
+      currentPlace = line[:-1]
+      currentFile.append(currentPlace)
 
-with open('apiDisplayNameLinkTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        displayNameLinkTopChannel.append(currentPlace)
+  currentFileLength = len(currentFile)
+  i = 0
+  while i < currentFileLength + 1:
+    nextFile.insert(0,1)
+    i += 1
 
-with open('apiViewsTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        viewsTopChannel.append(currentPlace)
+  with open('currentFile.txt', 'w') as filehandle:
+    for listitem in nextFile:
+      filehandle.write('%s\n' % listitem)
 
-with open('apiClipCreatorNameTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        clipCreatorNameTopChannel.append(currentPlace)
+  return currentFileLength
 
-with open('apiClipCreatorLinkTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        clipCreatorLinkTopChannel.append(currentPlace)
+def download_video(twitchClipLinks, currentFileLength):
+  x = twitchClipLinks[currentFileLength]
+  ydl_opts = {}
+  with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+      ydl.download([x])
 
-with open('apiClipUploadTimeTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        clipUploadTimeTopChannel.append(currentPlace)
+def manage_file():
+  files = os.listdir(os.curdir)
 
-with open('currentFileTopChannel.py', 'r') as filehandle:
-    for line in filehandle:
-        currentPlace = line[:-1]
-        currentFileTopChannel.append(currentPlace)
-
-
-currentFileLength = len(currentFileTopChannel)
-i = 0
-while i < currentFileLength + 1:
-  nextFileTopChannel.insert(0,1)
-  i += 1
-
-with open('currentFileTopChannel.py', 'w') as filehandle:
-    for listitem in nextFileTopChannel:
-        filehandle.write('%s\n' % listitem)
-
-
-x = twitchClipLinksTopChannel[currentFileLength]
-ydl_opts = {}
-with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-    ydl.download([x])
-time.sleep(10)
-
-
-def file_rename():
-    name_list=os.listdir(r"/home/ubuntu")
-    saved_path=os.getcwd()
-    os.chdir(r"/home/ubuntu")
-
-    for file_name in name_list:
-        os.rename(file_name, file_name.translate(str.maketrans('','','0123456789-')))
-    os.chdir(saved_path)
-file_rename()
-time.sleep(2)
-print('File Renamed')
-
-
-files = os.listdir(os.curdir)
-for file in files:
-    if '.mp' in file:
-        newfile = file.replace('.mp', '.mp4')
-        os.rename(file, newfile)
-time.sleep(2)
-print('File Converted')
-
-
-files = os.listdir(os.curdir)
-for file in files:
+  for file in files:
     if '.mp4' in file:
-        shutil.move(file, '/home/ubuntu/Youtube')
-time.sleep(10)
-print('File Moved')
+        os.rename(file, file.translate(str.maketrans('','','0123456789-')))
+
+  files = os.listdir(os.curdir)
+  for file in files:
+    if '.mp' in file:
+      newfile = file.replace('.mp', '.mp4')
+      os.rename(file, newfile)
+      shutil.move(newfile, 'Video')
 
 class YoutubeUpload:
   def __init__(self):
     self.MAX_RETRIES = 10
- 
+
     self.RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError, http.client.NotConnected,
       http.client.IncompleteRead, http.client.ImproperConnectionState,
       http.client.CannotSendRequest, http.client.CannotSendHeader,
@@ -151,7 +105,7 @@ class YoutubeUpload:
     self.API_VERSION = 'v3'
 
   def get_authenticated_service(self):
-      credential_path = os.path.join('/home/ubuntu/TopChannel/', 'credentials.json')
+      credential_path = os.path.join('credentials.json')
       store = Storage(credential_path)
       credentials = store.get()
       if not credentials or credentials.invalid:
@@ -175,8 +129,8 @@ class YoutubeUpload:
         privacyStatus=options.privacyStatus
       )
     )
-    
-    videoPath = "/home/ubuntu/Youtube/{}".format(options.getFileName("video"))
+
+    videoPath = "Video/{}".format(options.getFileName("video"))
     insert_request = youtube.videos().insert(
       part=','.join(body.keys()),
       body=body,
@@ -196,14 +150,13 @@ class YoutubeUpload:
         if response is not None:
           if 'id' in response:
             print ('The video with the id {} was successfully uploaded!'.format(response['id']))
-            
+
             options.insertThumbnail(youtube, response['id'])
           else:
             exit('The upload failed with an unexpected response: {}'.format(response))
       except HttpError as e:
         if e.resp.status in self.RETRIABLE_STATUS_CODES:
-          error = 'A retriable HTTP error {} occurred:\n{}'.format((e.resp.status,
-                                                              e.content))
+          error = 'A retriable HTTP error {} occurred:\n{}'.format((e.resp.status, e.content))
         else:
           raise
       except self.RETRIABLE_EXCEPTIONS as e:
@@ -221,8 +174,13 @@ class YoutubeUpload:
         time.sleep(sleep_seconds)
 
 if __name__ == '__main__':
-  youtubeUpload = YoutubeUpload()
+  delete()
+  VIDEO_URL = get_files()
+  CURRENT_VIDEO = current_file()
+  download_video(VIDEO_URL, CURRENT_VIDEO)
+  manage_file()
 
+  youtubeUpload = YoutubeUpload()
   args = Video()
   youtube = youtubeUpload.get_authenticated_service()
 

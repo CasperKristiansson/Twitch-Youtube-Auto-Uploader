@@ -103,4 +103,4 @@ def save_data(data):
 if __name__ == '__main__':
     delete()
     DATA = get_data()
-    #save_data(DATA)
+    save_data(DATA)
