@@ -2,8 +2,7 @@
 With this respiratory you can upload twitch clips from different categories directly to YouTube. I recommend reading through all the steps before trying to implement this program on your desirable device.
 
 <h2>Step 1: Create twitch Developer Account and Fetch Videos, Data</h2>
-Create an account on https://dev.twitch.tv/. After creating the account create an application in the console tab. In the application tab set the name as you want and set the redirect URL (OAuth) to "http://localhost". Also set the category to website integration.
-
+Create an account on https://dev.twitch.tv/. After creating the account create an application in the console tab. In the application tab set the name as you want and set the redirect URL (OAuth) to "http://localhost". Also set the category to website integration. 
 After creating the credential file copy the ID and paste it in the twitch_credentials.py file.
 The next part is choosing the different categories for the different videos to get. Note that YouTube only allows you to upload 6 videos a day, so set the max videos to 6. You can follow the documentation on https://dev.twitch.tv/docs/v5/reference/clips.
 
