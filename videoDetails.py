@@ -53,7 +53,6 @@ with open('apiClipUploadTime.txt', 'r') as filehandle:
 
 currentFileLength = len(currentFile)
 
-
 class Video:
     def __init__(self):
         clipUpTime = clipUploadTime[currentFileLength]
