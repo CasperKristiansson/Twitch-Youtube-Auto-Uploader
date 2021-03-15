@@ -16,3 +16,4 @@ personal_twitch_credentials.py
 Personal_client_secrets.json
 *.txt
 Personal_credentials.json
+!requirements.txt
