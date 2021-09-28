@@ -1,0 +1,1 @@
+game_name = 'League%20of%20Legends'
