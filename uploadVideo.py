@@ -4,6 +4,7 @@ import requests
 import os
 import shutil
 import time
+import pandas as pd
 
 import argparse
 import http.client
@@ -23,55 +24,14 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-def delete():
-  folder = 'Video'
-  for filename in os.listdir(folder):
-    file_path = os.path.join(folder, filename)
-    try:
-      if os.path.isfile(file_path) or os.path.islink(file_path):
-        os.unlink(file_path)
-      elif os.path.isdir(file_path):
-        shutil.rmtree(file_path)
-    except Exception as e:
-      print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-def get_files():
-  twitchClipLinks = []
-
-  with open('apiTwitchClipLinks.txt', 'r') as filehandle:
-    for line in filehandle:
-      currentPlace = line[:-1]
-      twitchClipLinks.append(currentPlace)
-
-  return twitchClipLinks
-
-def current_file():
-  currentFile = []
-  currentFileLength = []
-  nextFile = []
-
-  with open('currentFile.txt', 'r') as filehandle:
-    for line in filehandle:
-      currentPlace = line[:-1]
-      currentFile.append(currentPlace)
-
-  currentFileLength = len(currentFile)
-  i = 0
-  while i < currentFileLength + 1:
-    nextFile.insert(0,1)
-    i += 1
-
-  with open('currentFile.txt', 'w') as filehandle:
-    for listitem in nextFile:
-      filehandle.write('%s\n' % listitem)
-
-  return currentFileLength
-
-def download_video(twitchClipLinks, currentFileLength):
-  x = twitchClipLinks[currentFileLength]
-  ydl_opts = {}
-  with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-      ydl.download([x])
+def download_video(twitchClipLinks):
+	os.chdir('Video')
+	
+	ydl_opts = {}
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		ydl.download([twitchClipLinks])
+	
+	os.chdir('..')
 
 def manage_file():
   files = os.listdir(os.curdir)
@@ -173,18 +133,27 @@ class YoutubeUpload:
         print ('Sleeping {} seconds and then retrying...').format((sleep_seconds))
         time.sleep(sleep_seconds)
 
+def get_data():
+	current_video = 0
+	df = pd.read_excel('twitch_data.xlsx')
+
+	return df['url'][current_video]
+
+
+def main():
+	video_url = get_data()
+	download_video(video_url)
+	manage_file()
+
+	youtubeUpload = YoutubeUpload()
+	args = Video()
+	authentication = youtubeUpload.get_authenticated_service()
+
+	try:
+		youtubeUpload.initialize_upload(authentication, args)
+	except HttpError as e:
+		print ('An HTTP error {}} occurred:\n{}').format((e.resp.status, e.content))
+
 if __name__ == '__main__':
-  delete()
-  VIDEO_URL = get_files()
-  CURRENT_VIDEO = current_file()
-  download_video(VIDEO_URL, CURRENT_VIDEO)
-  manage_file()
-
-  youtubeUpload = YoutubeUpload()
-  args = Video()
-  youtube = youtubeUpload.get_authenticated_service()
-
-  try:
-    youtubeUpload.initialize_upload(youtube, args)
-  except HttpError as e:
-    print ('An HTTP error {}} occurred:\n{}').format((e.resp.status, e.content))
+	main()
+	
