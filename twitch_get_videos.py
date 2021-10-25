@@ -1,14 +1,14 @@
 import requests
 import pandas
 import twitch_credentials
-import videoInformation
+import video_information
 
 def get_data():
-    api_endpoint = f'https://api.twitch.tv/kraken/clips/top?game={videoInformation.game_name}&period=day&trending=false&limit=6&language=en'
-    head = {'Client-ID' : twitch_credentials.ID,
-            'Accept' : 'application/vnd.twitchtv.v5+json'}
+    api_endpoint = f'https://api.twitch.tv/kraken/clips/top?game={video_information.game_name}&period=day&trending=false&limit=6&language=en'
+    head = {'Client-ID' : twitch_credentials.ID, 'Accept' : 'application/vnd.twitchtv.v5+json'}
 
     data = requests.get(url = api_endpoint, headers = head)
+
     return data.json()
 
 def save_data(data):

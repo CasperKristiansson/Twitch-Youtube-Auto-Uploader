@@ -1,7 +1,7 @@
 from googleapiclient.http import MediaFileUpload
 import pandas
 import os
-import videoInformation
+import video_information
 import ast
 
 class Video:
@@ -30,19 +30,10 @@ Date and Time: {self.upload_time}
 """
 
         self.category = "24"
-        self.keywords = videoInformation.keywords
+        self.keywords = video_information.keywords
         self.privacyStatus = "public"
 
     def getFileName(self, type):
         for file in os.listdir("Video"):
-            if type == "video" and file.split(".", 1)[1] != "jpg":
+            if type == "video":
                 return file
-
-            elif type == "thumbnail" and file.split(".", 1)[1] != "mp4":
-                return file
-
-    def insertThumbnail(self, youtube, videoId):
-        thumnailPath = "Video\\{}".format(self.getFileName("thumbnail"))
-        request = youtube.thumbnails().set(videoId=videoId,
-                                            media_body=MediaFileUpload(thumnailPath))
-        response = request.execute()
