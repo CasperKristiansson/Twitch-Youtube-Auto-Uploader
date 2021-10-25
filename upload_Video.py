@@ -44,54 +44,54 @@ def manage_file():
 			shutil.move(newfile, 'Video')
 
 class YoutubeUpload:
-  def __init__(self):
-    self.MAX_RETRIES = 10
+	def __init__(self):
+		self.MAX_RETRIES = 10
 
-    self.RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError, http.client.NotConnected,
-      http.client.IncompleteRead, http.client.ImproperConnectionState,
-      http.client.CannotSendRequest, http.client.CannotSendHeader,
-      http.client.ResponseNotReady, http.client.BadStatusLine)
+		self.RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError, http.client.NotConnected,
+			http.client.IncompleteRead, http.client.ImproperConnectionState,
+			http.client.CannotSendRequest, http.client.CannotSendHeader,
+			http.client.ResponseNotReady, http.client.BadStatusLine)
 
-    self.RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
+		self.RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 
-    self.CLIENT_SECRETS_FILE = 'client_secrets.json'
+		self.CLIENT_SECRETS_FILE = 'client_secrets.json'
 
-    self.SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    self.API_SERVICE_NAME = 'youtube'
-    self.API_VERSION = 'v3'
+		self.SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+		self.API_SERVICE_NAME = 'youtube'
+		self.API_VERSION = 'v3'
 
-  def get_authenticated_service(self):
-      credential_path = os.path.join('credentials.json')
-      store = Storage(credential_path)
-      credentials = store.get()
-      if not credentials or credentials.invalid:
-          flow = client.flow_from_clientsecrets(self.CLIENT_SECRETS_FILE, self.SCOPES)
-          credentials = tools.run_flow(flow, store)
-      return build(self.API_SERVICE_NAME, self.API_VERSION, credentials=credentials)
+	def get_authenticated_service(self):
+		credential_path = os.path.join('credentials.json')
+		store = Storage(credential_path)
+		credentials = store.get()
+		if not credentials or credentials.invalid:
+			flow = client.flow_from_clientsecrets(self.CLIENT_SECRETS_FILE, self.SCOPES)
+			credentials = tools.run_flow(flow, store)
+		return build(self.API_SERVICE_NAME, self.API_VERSION, credentials=credentials)
 
-  def initialize_upload(self, youtube, options):
-  	tags = options.keywords.split(',') if options.keywords else None
-  	body=dict(
-  	  	snippet=dict(
-			title=options.getFileName("video").split(".", 1)[0],
-			description=options.description,
-			tags=tags,
-			categoryId=options.category
-  	  	),
-  	  	status=dict(
-  	    	privacyStatus=options.privacyStatus
-  	  	)
-  	)
+	def initialize_upload(self, youtube, options):
+		tags = options.keywords.split(',') if options.keywords else None
+		body=dict(
+			snippet=dict(
+				title=options.getFileName("video").split(".", 1)[0],
+				description=options.description,
+				tags=tags,
+				categoryId=options.category
+			),
+			status=dict(
+				privacyStatus=options.privacyStatus
+			)
+		)
 
-  	videoPath = "Video/{}".format(options.getFileName("video"))
+		videoPath = "Video/{}".format(options.getFileName("video"))
 
-  	insert_request = youtube.videos().insert(
-  	  	part=','.join(body.keys()),
-  	  	body=body,
-  	 	media_body=MediaFileUpload(videoPath, chunksize=-1, resumable=True)
-  	)
+		insert_request = youtube.videos().insert(
+			part=','.join(body.keys()),
+			body=body,
+			media_body=MediaFileUpload(videoPath, chunksize=-1, resumable=True)
+		)
 
-  	self.resumable_upload(insert_request, options)
+		self.resumable_upload(insert_request, options)
 
 def resumable_upload(self, request, options):
 	response = None
