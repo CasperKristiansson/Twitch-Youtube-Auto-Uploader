@@ -1,4 +1,3 @@
-from googleapiclient.http import MediaFileUpload
 import pandas
 import os
 import video_information
